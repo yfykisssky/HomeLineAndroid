@@ -21,12 +21,6 @@ android {
                 JPUSH_CHANNEL: "developer-default",
         ]
 
-        externalNativeBuild {
-            cmake {
-                cppFlags ""
-            }
-        }
-
     }
     buildTypes {
         release {

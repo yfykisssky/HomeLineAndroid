@@ -104,7 +104,6 @@ public class BaseActivity extends FragmentActivity implements ViewInterface {
         Message msg = new Message();
         msg.what = 1;
         msg.obj = text;
-        viewHandler.sendMessage(msg);
     }
 
     @Override
@@ -125,11 +124,9 @@ public class BaseActivity extends FragmentActivity implements ViewInterface {
         isPause = true;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onResume() {
         super.onResume();
-        isPause = false;
         if (isUseLock) {
             if (isPause) {
 
@@ -158,5 +155,6 @@ public class BaseActivity extends FragmentActivity implements ViewInterface {
 
             }
         }
+        isPause = false;
     }
 }

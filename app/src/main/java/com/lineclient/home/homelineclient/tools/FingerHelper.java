@@ -1,20 +1,16 @@
 package com.lineclient.home.homelineclient.tools;
 
 import android.content.Context;
-import android.hardware.fingerprint.FingerprintManager;
-import android.os.Build;
-import android.os.CancellationSignal;
-import android.support.annotation.RequiresApi;
-
+import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
+import android.support.v4.os.CancellationSignal;
+import android.text.TextUtils;
 import android.util.Base64;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.Signature;
-import java.security.SignatureException;
 import java.util.Map;
 
-@RequiresApi(api = Build.VERSION_CODES.M)
 public class FingerHelper {
 
     public interface FingerHelperInterface {
@@ -37,21 +33,17 @@ public class FingerHelper {
 
     }
 
-    private static FingerprintManager manager;
+    private static FingerprintManagerCompat manager;
     private static CancellationSignal mCancellationSignal;
 
-    public static boolean checkUsed(Context context){
+    public static boolean checkUsed(Context context) {
 
-     /*   manager = (FingerprintManager) context.getSystemService(Context.FINGERPRINT_SERVICE);
-
+        manager = FingerprintManagerCompat.from(context);
         if (manager.isHardwareDetected()) {
-            KeyguardManager keyguardManager = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
-            if (keyguardManager.isKeyguardSecure()) {
-                if (manager.hasEnrolledFingerprints()) {
-                    return true;
-                }
+            if (manager.hasEnrolledFingerprints()) {
+                return true;
             }
-        }*/
+        }
         return false;
     }
 
@@ -59,35 +51,10 @@ public class FingerHelper {
 
         try {
 
-            final String signData = SignatureUtils.getRandomString(15);
-
-            Map<String, Object> map = RSAHelper.RSAUtils.genKeyPair();
-            final String publicKey = RSAHelper.RSAUtils.getPublicKey(map);
-            String privateKey = RSAHelper.RSAUtils.getPrivateKey(map);
-
-            startCheck(context, privateKey, signData, new FingerHelperInterface() {
+            startCheck(context,null,null, new FingerHelperInterface() {
                 @Override
                 public void success(String data) {
-
-                    try {
-                        Signature signature = Signature.getInstance("SHA256withECDSA");
-                        signature.initVerify(SignatureUtils.getPublicKey(publicKey));
-                        signature.update(signData.getBytes());
-                        if (signature.verify(Base64.decode(data,Base64.DEFAULT))) {
-                            fingerHelperInterfaceUnLock.success();
-                        } else {
-                            fingerHelperInterfaceUnLock.error("");
-                        }
-                    } catch (SignatureException e) {
-                        e.printStackTrace();
-                    } catch (NoSuchAlgorithmException e) {
-                        e.printStackTrace();
-                    } catch (InvalidKeyException e) {
-                        e.printStackTrace();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
+                    fingerHelperInterfaceUnLock.success();
                 }
 
                 @Override
@@ -97,7 +64,7 @@ public class FingerHelper {
 
                 @Override
                 public void error(String msg) {
-                    fingerHelperInterfaceUnLock.error("");
+                    fingerHelperInterfaceUnLock.error(msg);
                 }
             });
 
@@ -108,9 +75,9 @@ public class FingerHelper {
 
     }
 
-    public static void startCheck(Context context,String aesPrivateKey, final String signData, final FingerHelperInterface fingerHelperInterface) {
+    public static void startCheck(Context context, final String aesPrivateKey, final String signData, final FingerHelperInterface fingerHelperInterface) {
 
-        if(!checkUsed(context)){
+        if (!checkUsed(context)) {
             fingerHelperInterface.failed();
         }
 
@@ -119,10 +86,13 @@ public class FingerHelper {
         }
 
         try {
-
-            Signature signature = Signature.getInstance("SHA256withECDSA");
-            signature.initSign(SignatureUtils.getPrivateKey(aesPrivateKey));
-            manager.authenticate(new FingerprintManager.CryptoObject(signature), mCancellationSignal, 0, new FingerprintManager.AuthenticationCallback() {
+            FingerprintManagerCompat.CryptoObject cryptoObject = null;
+            if (!TextUtils.isEmpty(aesPrivateKey)) {
+                Signature signature = Signature.getInstance("SHA256withECDSA");
+                signature.initSign(SignatureUtils.getPrivateKey(aesPrivateKey));
+                cryptoObject = new FingerprintManagerCompat.CryptoObject(signature);
+            }
+            manager.authenticate(cryptoObject, 0, mCancellationSignal, new FingerprintManagerCompat.AuthenticationCallback() {
                 @Override
                 public void onAuthenticationError(int errorCode, CharSequence errString) {
                     super.onAuthenticationError(errorCode, errString);
@@ -135,15 +105,15 @@ public class FingerHelper {
                 }
 
                 @Override
-                public void onAuthenticationSucceeded(FingerprintManager.AuthenticationResult result) {
+                public void onAuthenticationSucceeded(FingerprintManagerCompat.AuthenticationResult result) {
                     super.onAuthenticationSucceeded(result);
-
-                    try {
-                        Signature signature = result.getCryptoObject().getSignature();
-                        signature.update(signData.getBytes());
-                        byte[] sigBytes = signature.sign();
-                        fingerHelperInterface.success(Base64.encodeToString(sigBytes,Base64.DEFAULT));
-
+                    String msg = null;
+                    if (!TextUtils.isEmpty(aesPrivateKey)) {
+                        try {
+                            Signature signature = result.getCryptoObject().getSignature();
+                            signature.update(signData.getBytes());
+                            byte[] sigBytes = signature.sign();
+                            msg = Base64.encodeToString(sigBytes, Base64.DEFAULT);
                     /*    String signData="";
                         String signByte="";
                         Signature signature = Signature.getInstance("SHA256withECDSA");
@@ -155,9 +125,12 @@ public class FingerHelper {
 
                         }*/
 
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
+                    fingerHelperInterface.success(msg);
+
                 }
 
                 @Override

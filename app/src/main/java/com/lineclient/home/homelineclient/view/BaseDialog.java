@@ -35,7 +35,7 @@ public abstract class BaseDialog extends Dialog {
         WindowManager.LayoutParams wlp = window.getAttributes();
         window.setBackgroundDrawableResource(android.R.color.transparent);
         wlp.width = (int) (ViewTool.getScreenWidth(this.getContext()) * widthScale);
-        wlp.height = (int) (ViewTool.getScreenWidth(this.getContext()) * heightScaleWithWidth);
+        wlp.height = (int) (wlp.width * heightScaleWithWidth);
         window.setAttributes(wlp);
 
     }

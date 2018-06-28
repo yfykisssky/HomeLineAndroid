@@ -17,7 +17,7 @@ public class FingerDialog extends BaseDialog {
     }
 
     public FingerDialog(@NonNull Context context) {
-        super(context,3/4,3/4);
+        super(context,2.0/3.0,2.0/3.0);
         initView();
     }
 
