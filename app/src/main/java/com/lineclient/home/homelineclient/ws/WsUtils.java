@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.lineclient.home.homelineclient.tools.AESHelper;
 import com.lineclient.home.homelineclient.tools.DataUtils;
@@ -26,7 +27,7 @@ public class WsUtils {
 
     }
 
-    private List<WSServiceInterface> wsServiceInterfaceList;
+    private List<WSServiceInterface> wsServiceInterfaceList=new ArrayList<>();
     private WsService wsService;
     private ServiceConnection wSServiceConnection;
     private boolean wsConnectState = false;
@@ -35,9 +36,6 @@ public class WsUtils {
 
     public void addListener(WSServiceInterface wsServiceInterface) {
         synchronized (wsServiceInterfaceList) {
-            if (wsServiceInterfaceList == null) {
-                wsServiceInterfaceList = new ArrayList<>();
-            }
             wsServiceInterfaceList.add(wsServiceInterface);
         }
     }
@@ -157,7 +155,7 @@ public class WsUtils {
     }
 
     public boolean sendWsData(String data) {
-
+        Log.e("out",data);
         if (wsService != null) {
             if (wsConnectState) {
                 if (!Debug.debug) {

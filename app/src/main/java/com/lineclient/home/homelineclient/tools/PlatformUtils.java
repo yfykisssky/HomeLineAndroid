@@ -65,43 +65,43 @@ public class PlatformUtils {
     }
 
     private String orderUp() {
+        JSONObject json = new JSONObject();
         try {
-            JSONObject json = new JSONObject();
             json.put("camera_up", String.valueOf(1));
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return null;
+        return json.toString();
     }
 
     private String orderDown() {
+        JSONObject json = new JSONObject();
         try {
-            JSONObject json = new JSONObject();
             json.put("camera_down", String.valueOf(1));
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return null;
+        return json.toString();
     }
 
     private String stepLeft() {
+        JSONObject json = new JSONObject();
         try {
-            JSONObject json = new JSONObject();
             json.put("camera_left", String.valueOf(1));
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return null;
+        return json.toString();
     }
 
     private String stepRight() {
+        JSONObject json = new JSONObject();
         try {
-            JSONObject json = new JSONObject();
             json.put("camera_right", String.valueOf(1));
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return null;
+        return json.toString();
     }
 
 
