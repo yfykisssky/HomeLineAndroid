@@ -8,8 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.lineclient.home.homelineclient.R;
-import com.lineclient.home.homelineclient.application.MyApplication;
+import com.lineclient.home.homelineclient.tools.PlatformUtils;
 import com.lineclient.home.homelineclient.view.RockerView;
+import com.lineclient.home.homelineclient.ws.WsUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,14 +22,16 @@ import org.json.JSONObject;
 public class VideoFragment extends Fragment implements View.OnClickListener {
 
     private View view;
-    private MyApplication myApplication;
+    private WsUtils wsUtils;
+    private PlatformUtils platformUtils;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
 
         view = inflater.inflate(R.layout.fragment_video, container, false);
-        myApplication = (MyApplication) getActivity().getApplication();
+        wsUtils=WsUtils.getInstance(this.getContext());
+        platformUtils=PlatformUtils.getInstance(wsUtils);
 
         initView();
 
@@ -40,7 +43,7 @@ public class VideoFragment extends Fragment implements View.OnClickListener {
 
     private void initData() {
 
-        myApplication.startWsService(new MyApplication.WSServiceInterface() {
+        wsUtils.addListener(new WsUtils.WSServiceInterface() {
             @Override
             public void serviceConnect() {
 
@@ -71,6 +74,7 @@ public class VideoFragment extends Fragment implements View.OnClickListener {
 
             }
         });
+
     }
 
     private void initView() {
@@ -86,7 +90,7 @@ public class VideoFragment extends Fragment implements View.OnClickListener {
 
                 @Override
                 public void direction(RockerView.Direction direction) {
-                    handleDirection(direction);
+                    platformUtils.handleRockerViewDirection(direction);
                 }
 
                 @Override
@@ -97,81 +101,6 @@ public class VideoFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-
-    private void handleDirection(RockerView.Direction direction) {
-        switch (direction) {
-            case DIRECTION_LEFT:
-                myApplication.sendWsData(stepLeft());
-                break;
-            case DIRECTION_RIGHT:
-                myApplication.sendWsData(stepRight());
-                break;
-            case DIRECTION_UP:
-                myApplication.sendWsData(orderUp());
-                break;
-            case DIRECTION_DOWN:
-                myApplication.sendWsData(orderDown());
-                break;
-            case DIRECTION_UP_LEFT:
-                myApplication.sendWsData(stepLeft());
-                myApplication.sendWsData(orderUp());
-                break;
-            case DIRECTION_UP_RIGHT:
-                myApplication.sendWsData(stepRight());
-                myApplication.sendWsData(orderUp());
-                break;
-            case DIRECTION_DOWN_LEFT:
-                myApplication.sendWsData(stepLeft());
-                myApplication.sendWsData(orderDown());
-                break;
-            case DIRECTION_DOWN_RIGHT:
-                myApplication.sendWsData(stepRight());
-                myApplication.sendWsData(orderDown());
-                break;
-            default:
-                break;
-        }
-    }
-
-    private String orderUp() {
-        try {
-            JSONObject json = new JSONObject();
-            json.put("camera_up", String.valueOf(1));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private String orderDown() {
-        try {
-            JSONObject json = new JSONObject();
-            json.put("camera_down", String.valueOf(1));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private String stepLeft() {
-        try {
-            JSONObject json = new JSONObject();
-            json.put("camera_left", String.valueOf(1));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private String stepRight() {
-        try {
-            JSONObject json = new JSONObject();
-            json.put("camera_right", String.valueOf(1));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 
     @Override
     public void onClick(View view) {

@@ -15,6 +15,8 @@ import com.lineclient.home.homelineclient.tools.ShaPreHelper;
 import com.lineclient.home.homelineclient.tools.WifiHelper;
 import com.lineclient.home.homelineclient.ws.WsService;
 
+import java.util.List;
+
 //import cn.jpush.android.api.JPushInterface;
 
 /**
@@ -23,18 +25,7 @@ import com.lineclient.home.homelineclient.ws.WsService;
 
 public class MyApplication extends Application {
 
-    public interface WSServiceInterface extends WsService.WsGetDataInterface {
-
-        void serviceConnect();
-
-        void serviceDisconnect();
-
-    }
-
-    private WsService wsService;
-    private ServiceConnection wSServiceConnection;
     private WifiHelper wifiHelper;
-    private boolean wsConnectState=false;
 
     @Override
     public void onCreate() {
@@ -85,58 +76,6 @@ public class MyApplication extends Application {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         startActivity(intent);
-
-    }
-
-    public void startWsService(final WSServiceInterface wsServiceInterface) {
-
-        if(wsConnectState){
-            wSServiceConnection = new ServiceConnection() {
-                @Override
-                public void onServiceConnected(ComponentName name, IBinder service) {
-                    wsService = ((WsService.LocalBinder) service).getService();
-                    wsService.setWsGetDataInterface(wsServiceInterface);
-                    wsServiceInterface.serviceConnect();
-                    wsConnectState=true;
-                }
-
-                @Override
-                public void onServiceDisconnected(ComponentName name) {
-                    wsServiceInterface.serviceDisconnect();
-                    wsService = null;
-                    wsConnectState=false;
-                }
-            };
-
-            Intent intent = new Intent(this, WsService.class);
-
-            this.bindService(intent, wSServiceConnection, Context.BIND_AUTO_CREATE);
-        }
-
-    }
-
-    public boolean sendWsData(String data) {
-
-        if (wsService != null) {
-            if(wsConnectState){
-                wsService.sendData(data);
-                return true;
-            }
-        }
-        return false;
-
-    }
-
-    public boolean stopWsService() {
-
-        if (wsService != null) {
-            if(wsConnectState){
-                wsService.closeConnext();
-                this.unbindService(wSServiceConnection);
-                return true;
-            }
-        }
-        return false;
 
     }
 

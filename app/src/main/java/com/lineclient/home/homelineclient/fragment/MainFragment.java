@@ -17,7 +17,7 @@ import com.lineclient.home.homelineclient.application.MyApplication;
 import com.lineclient.home.homelineclient.contants.XMLContants;
 import com.lineclient.home.homelineclient.tools.ShaPreHelper;
 import com.lineclient.home.homelineclient.view.EnviromentBoard;
-import com.lineclient.home.homelineclient.ws.WsHelper;
+import com.lineclient.home.homelineclient.ws.WsUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -46,8 +46,8 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
     private final String RESRESH_ALL = "RESRESHALL";
     private final int DEFAULT_REFRESH_TIME = 5;
     private MyApplication myApplication;
-    private MyApplication.WSServiceInterface wsServiceInterface;
     private EnviromentBoard enviromentBoard;
+    private WsUtils wsUtils;
 
     @Nullable
     @Override
@@ -59,7 +59,8 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
         refurbishHandler = new RefushHandler();
         myApplication = (MyApplication) getActivity().getApplication();
         //showLoading();
-        wsServiceInterface = new MyApplication.WSServiceInterface() {
+        wsUtils=WsUtils.getInstance(this.getContext());
+        wsUtils.addListener(new WsUtils.WSServiceInterface() {
 
             @Override
             public void serviceConnect() {
@@ -97,14 +98,14 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 try {
                     jsonObject.put("kind", "get");
                     jsonObject.put("vv", "vv");
-                    myApplication.sendWsData(WsHelper.encryptAESData(jsonObject.toString()));
+                    wsUtils.sendWsData(WsUtils.encryptAESData(jsonObject.toString()));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
             }
 
-        };
+        });
 
         initData();
 
@@ -145,13 +146,13 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
 
     private void startRefreshAll() {
 
-        myApplication.startWsService(wsServiceInterface);
+        wsUtils.startWsService();
 
     }
 
     private void stopRefreshAll() {
 
-        if (myApplication.stopWsService()) {
+        if (wsUtils.stopWsService()) {
             refreshStateTex.setText("断开成功");
         } else {
             refreshStateTex.setText("尚未连接,不能断开");

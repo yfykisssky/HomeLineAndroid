@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.lineclient.home.homelineclient.net.NetDataConstants;
+import com.lineclient.home.homelineclient.tools.Debug;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft;
@@ -30,7 +31,7 @@ public class WsService extends Service {
     private URI serviceUrl;
     private WebSocketWorker webSocketWorker;
     private boolean isConnect = false;
-    private ViewHandler viewHandler=new ViewHandler(this);
+    private MsgHandler msgHandler = new MsgHandler(this);
 
     public interface WsGetDataInterface {
 
@@ -137,11 +138,11 @@ public class WsService extends Service {
         webSocketWorker.send(msg);
     }
 
-    private static class ViewHandler extends Handler {
+    private static class MsgHandler extends Handler {
 
         WeakReference<WsService> weakReference;
 
-        ViewHandler(WsService object) {
+        MsgHandler(WsService object) {
             weakReference = new WeakReference<>(object);
         }
 
@@ -162,7 +163,8 @@ public class WsService extends Service {
                         object.wsGetDataInterface.onError((String) msg.obj);
                         break;
                     case 3:
-                        object.wsGetDataInterface.onMessage((String) msg.obj);
+                        String data = (String) msg.obj;
+                        object.wsGetDataInterface.onMessage(data);
                         break;
                 }
             }
@@ -179,7 +181,7 @@ public class WsService extends Service {
 
         @Override
         public void onClose(int arg0, String arg1, boolean arg2) {
-            viewHandler.sendEmptyMessage(0);
+            msgHandler.sendEmptyMessage(0);
             isConnect = false;
         }
 
@@ -188,16 +190,16 @@ public class WsService extends Service {
 
             isConnect = false;
 
-            String errorMsg=error.getMessage();
+            String errorMsg = error.getMessage();
 
-            if(TextUtils.isEmpty(errorMsg)){
-                errorMsg="未知连接错误";
+            if (TextUtils.isEmpty(errorMsg)) {
+                errorMsg = "未知连接错误";
             }
 
-            Message msg=new Message();
-            msg.what=2;
-            msg.obj=errorMsg;
-            viewHandler.sendMessage(msg);
+            Message msg = new Message();
+            msg.what = 2;
+            msg.obj = errorMsg;
+            msgHandler.sendMessage(msg);
 
             if (isToTryAuto) {
 
@@ -218,15 +220,15 @@ public class WsService extends Service {
 
         @Override
         public void onMessage(String data) {
-            Message msg=new Message();
-            msg.what=3;
-            msg.obj=data;
-            viewHandler.sendMessage(msg);
+            Message msg = new Message();
+            msg.what = 3;
+            msg.obj = data;
+            msgHandler.sendMessage(msg);
         }
 
         @Override
         public void onOpen(ServerHandshake arg0) {
-            viewHandler.sendEmptyMessage(1);
+            msgHandler.sendEmptyMessage(1);
             isConnect = true;
         }
 
