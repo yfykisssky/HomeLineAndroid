@@ -4,9 +4,11 @@ public class NetDataConstants {
 
     //public static final String SERVER_URL = "http://yfykisssky.eicp.net:57588/HomeLines";
     //public static final String SERVER_URL="http://192.168.134.28:8080/HomeLines";
-    public static final String SERVER_URL = "http://192.168.0.105:8080/HomeLines";
+    public static final String SERVER_URL = "http://192.168.0.108:8080/HomeLineServer";
 
-    public static final String WS_URL = SERVER_URL + "/websocket";
+    public static final String WS_SERVER_URL = "ws://192.168.0.108:8080/HomeLineServer";
+
+    public static final String WS_URL = WS_SERVER_URL + "/websocket";
 
     public static final String GETPUBKEY = SERVER_URL + "/getpubkey";
 

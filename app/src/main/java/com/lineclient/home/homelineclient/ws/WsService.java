@@ -135,7 +135,9 @@ public class WsService extends Service {
     }
 
     public void sendData(String msg) {
-        webSocketWorker.send(msg);
+        if(isConnect){
+            webSocketWorker.send(msg);
+        }
     }
 
     private static class MsgHandler extends Handler {

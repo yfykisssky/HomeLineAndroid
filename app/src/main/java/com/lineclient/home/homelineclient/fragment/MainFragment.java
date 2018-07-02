@@ -95,13 +95,13 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
                 closeLoading();
                 refreshStateTex.setText("连接成功");
                 JSONObject jsonObject = new JSONObject();
-                try {
+             /*   try {
                     jsonObject.put("kind", "get");
                     jsonObject.put("vv", "vv");
                     wsUtils.sendWsData(WsUtils.encryptAESData(jsonObject.toString()));
                 } catch (JSONException e) {
                     e.printStackTrace();
-                }
+                }*/
 
             }
 
@@ -146,17 +146,17 @@ public class MainFragment extends BaseFragment implements View.OnClickListener {
 
     private void startRefreshAll() {
 
-        wsUtils.startWsService();
+       // wsUtils.startWsService();
 
     }
 
     private void stopRefreshAll() {
 
-        if (wsUtils.stopWsService()) {
+      /*  if (wsUtils.stopWsService()) {
             refreshStateTex.setText("断开成功");
         } else {
             refreshStateTex.setText("尚未连接,不能断开");
-        }
+        }*/
 
     }
 

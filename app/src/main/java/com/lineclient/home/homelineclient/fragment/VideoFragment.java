@@ -1,6 +1,8 @@
 package com.lineclient.home.homelineclient.fragment;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -12,9 +14,6 @@ import com.lineclient.home.homelineclient.tools.PlatformUtils;
 import com.lineclient.home.homelineclient.view.RockerView;
 import com.lineclient.home.homelineclient.ws.WsUtils;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 /**
  * Created by yangfengyuan on 2017/7/25.
  */
@@ -24,14 +23,15 @@ public class VideoFragment extends Fragment implements View.OnClickListener {
     private View view;
     private WsUtils wsUtils;
     private PlatformUtils platformUtils;
+    private RockerView.Direction directionState;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
 
         view = inflater.inflate(R.layout.fragment_video, container, false);
-        wsUtils=WsUtils.getInstance(this.getContext());
-        platformUtils=PlatformUtils.getInstance(wsUtils);
+        wsUtils = WsUtils.getInstance(this.getContext());
+        platformUtils = PlatformUtils.getInstance(wsUtils);
 
         initView();
 
@@ -74,8 +74,29 @@ public class VideoFragment extends Fragment implements View.OnClickListener {
 
             }
         });
+        wsUtils.startWsService();
+
+        directionHandler.postDelayed(directionRunnable, 200);
 
     }
+
+    Handler directionHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+
+        }
+    };
+
+    Runnable directionRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (directionState != null) {
+                platformUtils.handleRockerViewDirection(directionState);
+            }
+            directionHandler.postDelayed(directionRunnable, 100);
+        }
+    };
 
     private void initView() {
 
@@ -90,12 +111,12 @@ public class VideoFragment extends Fragment implements View.OnClickListener {
 
                 @Override
                 public void direction(RockerView.Direction direction) {
-                    platformUtils.handleRockerViewDirection(direction);
+                    directionState = direction;
                 }
 
                 @Override
                 public void onFinish() {
-
+                    directionState=null;
                 }
             });
         }

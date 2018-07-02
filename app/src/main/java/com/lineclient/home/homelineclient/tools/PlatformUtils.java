@@ -67,7 +67,8 @@ public class PlatformUtils {
     private String orderUp() {
         JSONObject json = new JSONObject();
         try {
-            json.put("camera_up", String.valueOf(1));
+            json.put("kind", "camera_up");
+            json.put("value", String.valueOf(1));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -77,7 +78,8 @@ public class PlatformUtils {
     private String orderDown() {
         JSONObject json = new JSONObject();
         try {
-            json.put("camera_down", String.valueOf(1));
+            json.put("kind", "camera_down");
+            json.put("value", String.valueOf(1));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -87,7 +89,8 @@ public class PlatformUtils {
     private String stepLeft() {
         JSONObject json = new JSONObject();
         try {
-            json.put("camera_left", String.valueOf(1));
+            json.put("kind", "camera_left");
+            json.put("value", String.valueOf(5));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -97,7 +100,8 @@ public class PlatformUtils {
     private String stepRight() {
         JSONObject json = new JSONObject();
         try {
-            json.put("camera_right", String.valueOf(1));
+            json.put("kind", "camera_right");
+            json.put("value", String.valueOf(5));
         } catch (JSONException e) {
             e.printStackTrace();
         }

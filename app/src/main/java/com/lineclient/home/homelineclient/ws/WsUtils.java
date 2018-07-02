@@ -27,7 +27,7 @@ public class WsUtils {
 
     }
 
-    private List<WSServiceInterface> wsServiceInterfaceList=new ArrayList<>();
+    private List<WSServiceInterface> wsServiceInterfaceList = new ArrayList<>();
     private WsService wsService;
     private ServiceConnection wSServiceConnection;
     private boolean wsConnectState = false;
@@ -58,7 +58,7 @@ public class WsUtils {
 
     public void startWsService() {
 
-        if (wsConnectState) {
+        if (!wsConnectState) {
             wSServiceConnection = new ServiceConnection() {
                 @Override
                 public void onServiceConnected(ComponentName name, IBinder service) {
@@ -155,7 +155,7 @@ public class WsUtils {
     }
 
     public boolean sendWsData(String data) {
-        Log.e("out",data);
+        Log.e("out", data);
         if (wsService != null) {
             if (wsConnectState) {
                 if (!Debug.debug) {
@@ -164,6 +164,7 @@ public class WsUtils {
                     JSONObject jsonObject = new JSONObject();
                     try {
                         jsonObject.put("data", data);
+                        data = jsonObject.toString();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
