@@ -90,26 +90,28 @@ public class MyApplication extends Application {
 
     public void startWsService(final WSServiceInterface wsServiceInterface) {
 
-        wSServiceConnection = new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                wsService = ((WsService.LocalBinder) service).getService();
-                wsService.setWsGetDataInterface(wsServiceInterface);
-                wsServiceInterface.serviceConnect();
-                wsConnectState=true;
-            }
+        if(wsConnectState){
+            wSServiceConnection = new ServiceConnection() {
+                @Override
+                public void onServiceConnected(ComponentName name, IBinder service) {
+                    wsService = ((WsService.LocalBinder) service).getService();
+                    wsService.setWsGetDataInterface(wsServiceInterface);
+                    wsServiceInterface.serviceConnect();
+                    wsConnectState=true;
+                }
 
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-                wsServiceInterface.serviceDisconnect();
-                wsService = null;
-                wsConnectState=false;
-            }
-        };
+                @Override
+                public void onServiceDisconnected(ComponentName name) {
+                    wsServiceInterface.serviceDisconnect();
+                    wsService = null;
+                    wsConnectState=false;
+                }
+            };
 
-        Intent intent = new Intent(this, WsService.class);
+            Intent intent = new Intent(this, WsService.class);
 
-        this.bindService(intent, wSServiceConnection, Context.BIND_AUTO_CREATE);
+            this.bindService(intent, wSServiceConnection, Context.BIND_AUTO_CREATE);
+        }
 
     }
 
