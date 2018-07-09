@@ -23,4 +23,6 @@ public class NetDataConstants {
     public static final String GETDATA = SERVER_URL + "/getdata";
 
     public static final String SEND_ORDER = SERVER_URL + "/sendorder";
+
+    public static final String GET_VIDEO_URL = SERVER_URL + "/getvideourl";
 }

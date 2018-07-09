@@ -9,14 +9,37 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.lineclient.home.homelineclient.view.VideoPlayerView
+                android:id="@+id/player_root"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <Button
+                    android:id="@+id/video_connect"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/button_selector"
+                    android:text="连接"
+                    android:textColor="#FFFFFF" />
+            </com.lineclient.home.homelineclient.view.VideoPlayerView>
+
+            <include layout="@layout/view_line" />
+        </LinearLayout>
+
         <com.lineclient.home.homelineclient.view.RockerView
             android:id="@+id/rockerview"
-            android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
+            android:layout_marginBottom="10dp"
+            android:layout_marginRight="10dp"
             rocker:areaBackground="@drawable/default_area_bg"
             rocker:rockerBackground="@drawable/default_rocker_bg"
             rocker:rockerRadius="15dp" />

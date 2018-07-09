@@ -8,22 +8,62 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.RelativeLayout;
 
 import com.lineclient.home.homelineclient.R;
+import com.lineclient.home.homelineclient.activity.BaseActivity;
+import com.lineclient.home.homelineclient.application.MyApplication;
+import com.lineclient.home.homelineclient.net.HttpConnectHelper;
+import com.lineclient.home.homelineclient.net.NetDataConstants;
+import com.lineclient.home.homelineclient.net.ViewInterface;
+import com.lineclient.home.homelineclient.tools.DataUtils;
 import com.lineclient.home.homelineclient.tools.PlatformUtils;
+import com.lineclient.home.homelineclient.tools.ViewTool;
 import com.lineclient.home.homelineclient.view.RockerView;
+import com.lineclient.home.homelineclient.view.VideoPlayerView;
 import com.lineclient.home.homelineclient.ws.WsUtils;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.lang.ref.WeakReference;
 
 /**
  * Created by yangfengyuan on 2017/7/25.
  */
 
-public class VideoFragment extends Fragment implements View.OnClickListener {
+public class VideoFragment extends BaseFragment implements View.OnClickListener {
 
     private View view;
     private WsUtils wsUtils;
     private PlatformUtils platformUtils;
     private RockerView.Direction directionState;
+    private VideoPlayerView videoPlayerView;
+    private Handler directionHandler = new Handler();
+    private DirectionRunnable directionRunnable = new DirectionRunnable(this);
+    private Button viewConnect;
+
+    private static class DirectionRunnable implements Runnable {
+
+        WeakReference<VideoFragment> weakReference;
+
+        DirectionRunnable(VideoFragment object) {
+            weakReference = new WeakReference<>(object);
+        }
+
+        @Override
+        public void run() {
+            VideoFragment object = weakReference.get();
+            if (object != null) {
+                if (object.directionState != null) {
+                    object.platformUtils.handleRockerViewDirection(object.directionState);
+                }
+                object.directionHandler.postDelayed(object.directionRunnable, 100);
+            }
+        }
+    }
+
 
     @Nullable
     @Override
@@ -38,6 +78,13 @@ public class VideoFragment extends Fragment implements View.OnClickListener {
         initData();
 
         return view;
+
+    }
+
+    private void initView() {
+
+        initVideo();
+        initControl();
 
     }
 
@@ -80,26 +127,14 @@ public class VideoFragment extends Fragment implements View.OnClickListener {
 
     }
 
-    Handler directionHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
+    void initVideo() {
+        viewConnect = view.findViewById(R.id.video_connect);
+        viewConnect.setOnClickListener(this);
+        videoPlayerView = view.findViewById(R.id.player_root);
+        videoPlayerView.init(this.getActivity());
+    }
 
-        }
-    };
-
-    Runnable directionRunnable = new Runnable() {
-        @Override
-        public void run() {
-            if (directionState != null) {
-                platformUtils.handleRockerViewDirection(directionState);
-            }
-            directionHandler.postDelayed(directionRunnable, 100);
-        }
-    };
-
-    private void initView() {
-
+    void initControl() {
         RockerView rockerView = view.findViewById(R.id.rockerview);
         if (rockerView != null) {
             rockerView.setCallBackMode(RockerView.CallBackMode.CALL_BACK_MODE_STATE_CHANGE);
@@ -116,18 +151,39 @@ public class VideoFragment extends Fragment implements View.OnClickListener {
 
                 @Override
                 public void onFinish() {
-                    directionState=null;
+                    directionState = null;
                 }
             });
         }
     }
 
-
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case 0:
+            case R.id.video_connect:
+                viewConnect.setEnabled(false);
+                getVideoUrl();
                 break;
         }
+    }
+
+    public void getVideoUrl() {
+        HttpConnectHelper.doAESPost((ViewInterface) this.getActivity(), NetDataConstants.GET_VIDEO_URL, null, null, new HttpConnectHelper.ResponseCallBack() {
+            @Override
+            public void callBack(String body) {
+                try {
+                    JSONObject jsonObject = new JSONObject(body);
+                    if (jsonObject.getBoolean("success")) {
+                        viewConnect.setVisibility(View.GONE);
+                        String url = jsonObject.getString("url");
+                        videoPlayerView.startPlay(url);
+                    } else {
+                        viewConnect.setEnabled(true);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }

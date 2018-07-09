@@ -1,6 +1,7 @@
 package com.lineclient.home.homelineclient.net;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.lineclient.home.homelineclient.application.MyApplication;
@@ -67,7 +68,7 @@ public class HttpConnectHelper {
 
         viewInterface.showLoading();
 
-        Request request = new Request.Builder().url(url).addHeader("Connection","close").build();
+        Request request = new Request.Builder().url(url).addHeader("Connection", "close").build();
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(30, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)
@@ -105,7 +106,7 @@ public class HttpConnectHelper {
 
         try {
 
-            Request request = new Request.Builder().url(url).post(RequestBody.create(MediaType.parse("application/json;charset=utf-8"), postBody)).addHeader("Connection","close").build();
+            Request request = new Request.Builder().url(url).post(RequestBody.create(MediaType.parse("application/json;charset=utf-8"), postBody)).addHeader("Connection", "close").build();
             OkHttpClient client = new OkHttpClient.Builder()
                     .connectTimeout(30, TimeUnit.SECONDS)
                     .readTimeout(30, TimeUnit.SECONDS)
@@ -148,7 +149,7 @@ public class HttpConnectHelper {
 
     }
 
-    public static void doAESPost(final ViewInterface viewInterface, String url, Map<String, String> params, String postBody, final ResponseCallBack responseCallBack) {
+    public static void doAESPost(@NonNull final ViewInterface viewInterface, String url, Map<String, String> params, String postBody, final ResponseCallBack responseCallBack) {
 
         viewInterface.showLoading();
 
@@ -172,7 +173,7 @@ public class HttpConnectHelper {
                 postBody = AESHelper.encryptByBase64(postBody, DataUtils.getAesNetKey());
             }
 
-            Request request = new Request.Builder().url(url).post(RequestBody.create(MediaType.parse("application/json;charset=utf-8"), postBody)).addHeader("Connection","close").build();
+            Request request = new Request.Builder().url(url).post(RequestBody.create(MediaType.parse("application/json;charset=utf-8"), postBody)).addHeader("Connection", "close").build();
             OkHttpClient client = new OkHttpClient.Builder()
                     .connectTimeout(30, TimeUnit.SECONDS)
                     .readTimeout(30, TimeUnit.SECONDS)
@@ -197,7 +198,7 @@ public class HttpConnectHelper {
 
                             if (!Debug.debug) {
 
-                                if(!TextUtils.isEmpty(res)){
+                                if (!TextUtils.isEmpty(res)) {
 
                                 }
 
@@ -205,10 +206,10 @@ public class HttpConnectHelper {
                                 JSONObject jsonRes = new JSONObject(res);
 
                                 if (jsonRes.getBoolean("tokenstate")) {
-                                    if(jsonRes.getBoolean("flag")){
+                                    if (jsonRes.getBoolean("flag")) {
                                         responseCallBack.callBack(res);
                                         viewInterface.showMsg(jsonRes.getString("msg"));
-                                    }else{
+                                    } else {
                                         viewInterface.showErrorMsg(jsonRes.getString("msg"));
                                     }
 
