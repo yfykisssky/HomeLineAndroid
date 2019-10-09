@@ -2,31 +2,26 @@ package com.lineclient.home.homelineclient.fragment;
 
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.lineclient.home.homelineclient.R;
-import com.lineclient.home.homelineclient.activity.BaseActivity;
-import com.lineclient.home.homelineclient.application.MyApplication;
 import com.lineclient.home.homelineclient.net.HttpConnectHelper;
 import com.lineclient.home.homelineclient.net.NetDataConstants;
 import com.lineclient.home.homelineclient.net.ViewInterface;
-import com.lineclient.home.homelineclient.tools.DataUtils;
 import com.lineclient.home.homelineclient.tools.PlatformUtils;
-import com.lineclient.home.homelineclient.tools.ViewTool;
+import com.lineclient.home.homelineclient.view.PlayFrame;
 import com.lineclient.home.homelineclient.view.RockerView;
-import com.lineclient.home.homelineclient.view.VideoPlayerView;
 import com.lineclient.home.homelineclient.ws.WsUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 
 /**
@@ -39,7 +34,7 @@ public class VideoFragment extends BaseFragment implements View.OnClickListener 
     private WsUtils wsUtils;
     private PlatformUtils platformUtils;
     private RockerView.Direction directionState;
-    private VideoPlayerView videoPlayerView;
+    private PlayFrame videoPlayerView;
     private Handler directionHandler = new Handler();
     private DirectionRunnable directionRunnable = new DirectionRunnable(this);
     private Button viewConnect;
@@ -131,7 +126,17 @@ public class VideoFragment extends BaseFragment implements View.OnClickListener 
         viewConnect = view.findViewById(R.id.video_connect);
         viewConnect.setOnClickListener(this);
         videoPlayerView = view.findViewById(R.id.player_root);
-        videoPlayerView.init(this.getActivity());
+        videoPlayerView.init(this.getContext());
+
+        videoPlayerView.setPath("rtmp://media3.sinovision.net:1935/live/livestream");
+        try {
+            videoPlayerView.start();
+        } catch (IOException e) {
+            // Toast.makeText(this,"播放失败",Toast.LENGTH_SHORT);
+            e.printStackTrace();
+        }
+
+
     }
 
     void initControl() {
@@ -176,7 +181,13 @@ public class VideoFragment extends BaseFragment implements View.OnClickListener 
                     if (jsonObject.getBoolean("success")) {
                         viewConnect.setVisibility(View.GONE);
                         String url = jsonObject.getString("url");
-                        videoPlayerView.startPlay(url);
+                        videoPlayerView.setPath(url);
+                        try {
+                            videoPlayerView.start();
+                        } catch (IOException e) {
+                           // Toast.makeText(this,"播放失败",Toast.LENGTH_SHORT);
+                            e.printStackTrace();
+                        }
                     } else {
                         viewConnect.setEnabled(true);
                     }

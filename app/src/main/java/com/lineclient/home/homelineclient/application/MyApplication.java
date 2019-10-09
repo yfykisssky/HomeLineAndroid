@@ -9,8 +9,6 @@ import com.lineclient.home.homelineclient.net.HttpConnectHelper;
 import com.lineclient.home.homelineclient.tools.ShaPreHelper;
 import com.lineclient.home.homelineclient.tools.WifiHelper;
 
-import org.videolan.libvlc.VLCInit;
-
 import cn.jpush.android.api.JPushInterface;
 
 //import cn.jpush.android.api.JPushInterface;
@@ -29,7 +27,7 @@ public class MyApplication extends Application {
 
         HttpConnectHelper.init(this);
         JPushInterface.init(this);
-        VLCInit.init(this);
+        //VLCInit.init(this);
         initAutoExe();
 
     }
