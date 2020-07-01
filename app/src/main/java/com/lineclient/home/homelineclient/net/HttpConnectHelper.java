@@ -128,7 +128,7 @@ public class HttpConnectHelper {
                         String res = response.body().string();
 
                         try {
-                            res = AESHelper.decryptByBase64(res, DataUtils.getAesNetKey());
+                            //res = AESHelper.decryptByBase64(res, DataUtils.aesNetKey);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -157,7 +157,7 @@ public class HttpConnectHelper {
             params = new HashMap<>();
         }
 
-        params.put("username", DataUtils.getUserName());
+        //params.put("username", DataUtils.userName);
 
         url = url + mapToUrl(params);
 
@@ -167,11 +167,11 @@ public class HttpConnectHelper {
 
             jsonObject.put("data", postBody);
 
-            if (!Debug.debug) {
-                jsonObject.put("token", DataUtils.getToken());
+           /* if (!Debug.debug) {
+                jsonObject.put("token", DataUtils.token);
                 postBody = jsonObject.toString();
-                postBody = AESHelper.encryptByBase64(postBody, DataUtils.getAesNetKey());
-            }
+                postBody = AESHelper.encryptByBase64(postBody, DataUtils.aesNetKey);
+            }*/
 
             Request request = new Request.Builder().url(url).post(RequestBody.create(MediaType.parse("application/json;charset=utf-8"), postBody)).addHeader("Connection", "close").build();
             OkHttpClient client = new OkHttpClient.Builder()
@@ -196,13 +196,14 @@ public class HttpConnectHelper {
 
                             String res = response.body().string();
 
-                            if (!Debug.debug) {
+                          /*  if (!Debug.debug) {
 
                                 if (!TextUtils.isEmpty(res)) {
 
                                 }
 
-                                res = AESHelper.encryptByBase64(response.body().string(), DataUtils.getAesNetKey());
+                                res = AESHelper.encryptByBase64(response.body().string(),
+                                        DataUtils.aesNetKey);
                                 JSONObject jsonRes = new JSONObject(res);
 
                                 if (jsonRes.getBoolean("tokenstate")) {
@@ -220,7 +221,7 @@ public class HttpConnectHelper {
                                 }
                             } else {
                                 responseCallBack.callBack(res);
-                            }
+                            }*/
 
                         } catch (Exception e) {
                             viewInterface.showErrorMsg(e.getMessage());
